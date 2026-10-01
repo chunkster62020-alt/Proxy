@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Workspace</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0f172a; color: #fff; font-family: system-ui, -apple-system, sans-serif; overflow: hidden; }
+        .nav-bar { display: flex; gap: 10px; padding: 10px; background: #1e293b; align-items: center; }
+        input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 14px; }
+        input:focus { outline: 2px solid #38bdf8; }
+        button { padding: 10px 20px; border-radius: 6px; border: none; background: #2563eb; color: white; cursor: pointer; font-weight: bold; }
+        button:hover { background: #1d4ed8; }
+        iframe { width: 100vw; height: calc(100vh - 85px); border: none; background: white; }
+        .bookmarks { display: flex; gap: 15px; padding: 8px 10px; background: #0f172a; border-bottom: 1px solid #334155; font-size: 13px; }
+        .bookmark { color: #38bdf8; cursor: pointer; text-decoration: none; font-weight: 500; }
+        .bookmark:hover { text-decoration: underline; color: #7dd3fc; }
+        
+        /* Boss Screen Layout */
+        #bossScreen { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: white; 
+            color: black; 
+            padding: 40px; 
+            z-index: 99999; 
+            font-family: 'Times New Roman', Times, serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Boss Screen Panel (Press Escape to Toggle) -->
+    <div id="bossScreen">
+        <h1 style="font-size: 24px; font-weight: normal; margin-bottom: 5px;">Document1 - Microsoft Word</h1>
+        <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
+        <p style="font-size: 16px; line-height: 1.5;">
+            <strong>Introduction to Macroeconomics (Q3 Review)</strong><br><br>
+            The fundamental economic problem faced by all societies is scarcity. Scarcity arises because human wants are virtually unlimited, while the resources required to satisfy those wants are finite. Consequently, choices must be made regarding resource allocation.
+        </p>
+    </div>
+
+    <!-- Main Controller Navigation -->
+    <div class="nav-bar">
+        <input type="text" id="urlInput" placeholder="Enter URL (e.g., google.com) or search query...">
+        <button onclick="handleSearch()">Go</button>
+    </div>
+
+    <!-- Live Bookmarks Bar -->
+    <div class="bookmarks">
+        <span class="bookmark" onclick="loadUrl('https://tiktok.com')">🎵 TikTok</span>
+        <span class="bookmark" onclick="loadUrl('https://youtube.com')">📺 YouTube</span>
+        <span class="bookmark" onclick="loadUrl('https://nvidia.com')">🎮 GeForce NOW</span>
+        <span class="bookmark" onclick="loadUrl('https://xbox.com')">💚 Xbox Cloud</span>
+    </div>
+
+    <!-- Execution Window Frame -->
+    <iframe id="proxyViewer" src="about:blank"></iframe>
+
+    <script>
+        // Fallback network routing configuration paths
+        const PROVIDERS = [
+            { name: "Ultraviolet", prefix: "/uv/service/" },
+            { name: "Utopia", prefix: "/utopia/service/" },
+            { name: "LunarV2", prefix: "/lunar/proxy/" }
+        ];
+
+        let currentProviderIndex = 0;
+        let activeTargetUrl = "";
+
+        function handleSearch() {
+            const input = document.getElementById("urlInput").value.trim();
+            if (!input) return;
+
+            // Simple text query parsing vs URL path routing logic
+            if (input.includes('.') && !input.includes(' ')) {
+                activeTargetUrl = input.startsWith('http') ? input : 'https://' + input;
+            } else {
+                activeTargetUrl = 'https://google.com' + encodeURIComponent(input);
+            }
+            
+            currentProviderIndex = 0; // Always start with Ultraviolet
+            launchProxyStream();
+        }
+
+        function loadUrl(url) {
+            document.getElementById("urlInput").value = url;
+            activeTargetUrl = url;
+            currentProviderIndex = 0;
+            launchProxyStream();
+        }
+
+        function launchProxyStream() {
+            const iframe = document.getElementById("proxyViewer");
+            
+            if (currentProviderIndex < PROVIDERS.length) {
+                const current = PROVIDERS[currentProviderIndex];
+                console.log(`Attempting connection via: ${current.name}`);
+                
+                // Fallback to simple direct URL structure if script handlers are missing
+                if (window.__uv\(config && typeof window.__uv\)config.encodeUrl === 'function') {
+                    iframe.src = current.prefix + window.__uv\$config.encodeUrl(activeTargetUrl);
+                } else {
+                    // Safe direct fallback structure
+                    iframe.src = current.prefix + encodeURIComponent(activeTargetUrl);
+                }
+            } else {
+                // Final execution fallback to the Node.js server simulated engine
+                console.warn("All primary network configurations exhausted. Initializing server-side backup routing.");
+                iframe.src = "/chromium-session?url=" + encodeURIComponent(activeTargetUrl);
+            }
+        }
+
+        // Detect connection load issues to kickstart the next sequential provider
+        document.getElementById("proxyViewer").addEventListener('error', () => {
+            console.error(`Provider path failed. Advancing network sequence list.`);
+            currentProviderIndex++;
+            launchProxyStream();
+        });
+
+        // Boss Screen Key Action Listener 
+        window.addEventListener('keydown', (e) => {
+            if (e.key === "Escape") { // Triggers instantly when hitting the Escape key
+                const panel = document.getElementById("bossScreen");
+                if (panel.style.display === "none" || panel.style.display === "") {
+                    panel.style.display = "block";
+                } else {
+                    panel.style.display = "none";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
